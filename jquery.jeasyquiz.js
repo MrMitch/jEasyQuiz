@@ -623,6 +623,8 @@
 					case ($answer.data("type") == "true" && !$answer.prop("checked")) :
 						check = false;
 						break;
+					default :
+						break;
 				}
 			}
 
