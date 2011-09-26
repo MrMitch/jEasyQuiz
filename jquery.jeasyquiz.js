@@ -15,7 +15,9 @@
 
 (function($)
 {
-	// jEasyQuiz default settings
+	/**
+	 * jEasyQuiz default settings
+	 */
 	var settings = {
 		// main options
 		source: '', // URL of the file containing the exercises' data
@@ -70,8 +72,87 @@
 		}
 	};
 	
-	var methods = {
-		init: function(options) 
+	var exercisesFactory = {
+		Exercise: function($source)
+		{
+			var $_source = $source;
+			console.log('$source');
+			console.log($source);
+			console.log('$_source');
+			console.log($_source);
+
+			this.title = $_source.find('title').text();
+
+			this.questions = $_source.find('question');
+
+			this.current_question = -1;
+
+			this.initialized = false;
+
+			this.last_question = this.questions.length-1;
+
+			this.input_type = 'radio';
+
+			this.type = parseInt($_source.attr('type'));
+		},
+		
+		PicturePicking: function($source)
+		{
+			exercisesFactory.Exercise.call(this, $source);
+
+			this.zones = $(source).find('zone');
+		},
+		
+		MultipleAnswers: function($source)
+		{
+			exercisesFactory.Exercise.call(this, $source);
+		},
+		
+		DragAndDrop: function($source)
+		{
+			exercisesFactory.Exercise.call(this, $source);
+		}
+	}
+	
+	exercisesFactory.PicturePicking.prototype = new exercisesFactory.Exercise();
+	exercisesFactory.MultipleAnswers.prototype = new exercisesFactory.Exercise();
+	exercisesFactory.DragAndDrop.prototype = new exercisesFactory.Exercise();
+	
+	
+	
+	/**
+	 * Internal data
+	 */
+	var _data = {
+		exercises: [],
+		score: 0,
+		totalQuestions: 0,
+		currentQuestion: 0
+	};
+	
+	/**
+	 * Methods the user can call
+	 */
+	var publicMethods = {
+		//,
+		
+		
+		
+		test: function()
+		{
+			console.log(this);
+		}
+	};
+	
+	/**
+	 * Private methods unavailable for end-users
+	 */
+	var privateMethods = {
+		/**
+		 * Initialize the quiz
+		 * @param options An option object
+		 */
+		_init: function(options) 
 		{
 			$.extend(settings, options);
 			
@@ -79,41 +160,114 @@
 			{
 				var $this = $(this);
 				var data = $this.data('jeasyquiz');
-         
-				console.log(settings);
 		 
 				// If the plugin hasn't been initialized yet
 				if (!data) 
 				{
-					$this.data('jeasyquiz', {
-						container : $this,
-						jeasyquiz : 'test'
-					});
+					if(!settings.source || settings.source === '')
+					{
+						$.error('Unable to initialize the quiz because no source of data supplied.');
+					}
+					else
+					{
+						$.ajax({
+							url: settings.source,
+							async: true,
+							type: settings.requestMethod,
+							data: (settings.data),
+							dataType: 'xml',
+							success: function(data)
+							{
+								privateMethods.processData($(data).find('exercise'));
+								//settings.data = data;
+							},
+							error: function()
+							{
+								$.error('Unable to initialize the quiz because the data source could not be reached.');
+							}
+						});
+
+						_data.score = settings.initialScore;
+					}
+					
+					data = _data;
 				}
 			});
 		},
 		
-		test: function()
+		/**
+		 * Build the exercises from raw xml data
+		 * @param rawExercises The raw data
+		 */
+		processData: function(rawExercises)
 		{
-			console.log(settings);
-			console.log(data);
+			var len = rawExercises.length;
+			
+			for(var i=0; i<len; i++)
+			{
+				//switch (rawExercises.eq(i).attr('type')) 
+				switch (rawExercises[i].getAttribute('type'))
+				{
+					case 1 : 
+					case '1' :
+					case 'PicturePicking' : 
+					case 'pp' :
+						_data.exercises.push(new exercisesFactory.PicturePicking(rawExercises[i]));
+						_data.total_questions += _data.exercises[i].getQuestions().length;
+						break;
+					case 2 : 
+					case '2' :
+					case 'MissingWord' : 
+					case 'mw' :
+						_data.exercises.push(new exercisesFactory.Exercise(rawExercises[i]));
+						_data.total_questions += _data.exercises[i].getQuestions().length;
+						break;
+					case 3 : 
+					case '3' :
+					case 'AudioMatching' : 
+					case 'am' :
+						_data.exercises.push(new exercisesFactory.Exercise(rawExercises[i]));
+						_data.total_questions += _data.exercises[i].getQuestions().length;
+						break;
+					case 4 : 
+					case '4' : 
+					case 'MultipleAnswers' : 
+					case 'ma' :
+						_data.exercises.push(new exercisesFactory.MultipleAnswers(rawExercises[i]));
+						_data.total_questions += _data.exercises[i].getQuestions().length;
+						break;
+					case 5 : 
+					case '5' : 
+					case 'dd' :
+					case 'DragAndDrop' : 
+					case 'dnd' :
+						_data.exercises.push(new exercisesFactory.DragAndDrop(rawExercises[i]));
+						_data.total_questions += _data.exercises[i].getQuestions().length;
+						break;
+					default:
+						break;
+				}
+
+				console.log(_data.exercises);
+			}
 		}
 	};
-
+	
+	//<editor-fold defaultState="collapsed">
 	$.fn.jEasyQuiz = function(params)
 	{
-		if (methods[params]) 
+		if (publicMethods[params]) 
 		{
-			return methods[params].apply(this, Array.prototype.slice.call(arguments, 1));
+			return publicMethods[params].apply(this, Array.prototype.slice.call(arguments, 1));
 		} 
 		else if (typeof params === 'object' || !params) 
 		{
-			return methods.init.apply(this, arguments);
+			return privateMethods._init.apply(this, arguments);
 		} 
 		else 
 		{
 			return $.error('Method ' + params + ' does not exist on jQuery.jEasyQuiz');
 		}
 	};
-
+	//</editor-fold>
 })(jQuery);
