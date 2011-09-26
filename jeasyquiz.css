@@ -1,0 +1,107 @@
+/* 
+    Document   : quizz.css
+    Created on : 6 avr. 2011, 14:25:40
+    Author     : Mickael
+    Description:
+*/
+
+.quizz_btn_go .go_img 
+{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url("images/go.png"); 
+    background-repeat: no-repeat; 
+    background-position: right bottom;
+}
+.quizz_btn_go:hover span.go_img 
+{
+    background-position: right top;
+}
+
+
+.quizz_mp3player_c {
+	margin-left:20px; 
+	margin-top:30px; 
+	margin-bottom:30px
+}
+
+.quizz_exercise img {
+	margin: 2px; 
+	border-width: 0;
+}
+
+/**
+ * Action bar
+ */
+.quizz_action_bar {
+	margin-top: 40px;
+}
+
+.quizz_action_bar button, 
+.quizz_action_bar .quizz_feedback_ok,
+.quizz_action_bar .quizz_feedback_wrong {
+	margin-left: 10px;
+}
+
+/**
+ * Visual feedback
+ */
+.quizz_action_bar .quizz_feedback_ok {
+	background-image: url("images/check.png"); 
+	color:green;
+}
+
+
+.quizz_action_bar .quizz_feedback_wrong {
+	background-image: url("images/bad.png"); 
+	color:red;
+}
+
+.quizz_action_bar .quizz_feedback_ok,
+.quizz_action_bar .quizz_feedback_wrong {
+    padding-left: 20px;
+    background-position: left center;
+    background-repeat: no-repeat;
+}
+
+.quizz_exercise img.quizz_picked {
+	border: 2px blue solid; 
+	margin:0;
+}
+.quizz_exercise img.quizz_correct {
+	border: 2px green solid; 
+	margin:0;
+}
+.quizz_exercise img.quizz_wrong {
+	border: 2px red solid; 
+	margin:0;
+}
+
+.quizz_picked {
+	color:blue; 
+	font-weight:bold;
+}
+.quizz_correct {
+	color:green; 
+	font-weight:bold;
+}
+.quizz_wrong {
+	color:red; 
+	font-weight:bold;
+}
+
+/**
+ * Draggable & droppable
+ */
+.quizz_container ol li {
+	margin:10px;
+}
+li.quizz_draggable {
+	border: 1px solid black; 
+	display:inline-block; 
+	padding:5px; 
+}
+li.quizz_droppable {
+	padding: 10px;
+}
