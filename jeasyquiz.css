@@ -99,6 +99,8 @@ li.quizz_draggable {
 	display:inline-block; 
 	padding:5px; 
 }
+
 li.quizz_droppable {
+	margin: 10px;
 	padding: 10px;
 }

@@ -23,7 +23,7 @@
 		source: '', // URL of the file containing the exercises' data
 		data: {}, // data to send to the source file
 		requestMethod: 'get', // source file request method (MUST BE either 'get' or 'post')
-		audio: false, // whether or not audio files are used in the quizz
+		media: false, // whether or not media files (audio|video) are used in the quizz
 
 		// classes of the various containers
 		loading: 'quizz_loading', // the class of the element containing the loading informations
@@ -31,10 +31,11 @@
 		statement: 'quizz_statement', // the class of the statement container
 		score: 'quizz_score', // the class of the score container
 		feedback: 'quizz_feedback',
-		content: 'quizz_exercise', // the class of the exercise container, i.e. the element where the user will click and drag'n'drop
+		content: 'quizz_exercise', // the class of the exercise' data container
 		actionBar: 'quizz_action_bar', // the class of the action bar, containing the buttons
 		dragContainer: 'quizz_drags', // the class of the element that will contain the draggable elements
-
+		dropContainer: 'quizz_drops', // the class of the element that will contain the droppable elements
+		
 		// buttons and inputs
 		btnNext: 'quizz_btn_next', // the class of the 'Next' button
 		btnGo: 'quizz_btn_go', // the class of the 'GO' button
@@ -104,7 +105,11 @@
 		/*
 		 * GETTERS
 		 */
-
+		/**
+		 * Get the title of the exercise
+		 * 
+		 * @return String
+		 */
 		getTitle: function()
 		{ 
 			return this.title;
@@ -114,26 +119,31 @@
 		 * return the statement of the question at the specified index
 		 * or the current question if no parameter supplied
 		 * 
-		 * @param index number the index of the question from which the statement has to be returned
+		 * @param index the index of the question from which the statement has to be returned
 		 * 
 		 * @return string
 		 */
 		getStatement: function(index)
 		{
-			if(!index)
+			if(arguments.length == 0)
 			{
 				index = this.currentQuestion;
 			}
 			
-			return (1+index) + '. ' + $(this.questions[index]).find('statement').text();
+			return (1+index) + '. ' + this.getQuestion(index).find('statement').text();
 		},
 		
+		/**
+		 * Get the content to display for the current question
+		 * 
+		 * @return DOMFragment
+		 */
 		getContent: function()
 		{
 			// cache the document var
 			var d = document;
 			// get all the possible answers
-			var answers = $(this.getAnswers()).find('choice');
+			var answers = this.getAnswers().find('choice');
 			// create an ordered list to contain the answers
 			var answersContainer = d.createElement('ol');
 			var answer;
@@ -172,27 +182,26 @@
 		 * 
 		 * @param index the index of the question that has to be returned
 		 * 
-		 * @return element
+		 * @return the question as a jQuey object
 		 */
 		getQuestion: function(index)
 		{
-			if(!index)
+			if(arguments.length == 0)
+			{
 				index = this.currentQuestion;
+			}
 			else
+			{
 				index = parseInt(index);
+			}
 
-			return this.questions[index];
-		},
-
-		getQuestionNum: function()
-		{
-			return this.currentQuestion;
+			return $(this.questions[index]);
 		},
 
 		/**
 		 * return an array containing all the questions of the exercise
 		 * 
-		 * @return array
+		 * @return Array
 		 */
 		getQuestions: function()
 		{
@@ -202,7 +211,7 @@
 		/**
 		 * return the answers for the current question
 		 * 
-		 * @return array
+		 * @return Array
 		 */
 		getAnswers: function(type)
 		{               
@@ -211,22 +220,22 @@
 			if(type && type.length > 1)
 				selector += '[type="' + type + '"]';
 
-			return $(this.questions[this.currentQuestion]).find(selector);
+			return this.getQuestion().find(selector);
 		},
 
 		/**
-		 * get the feedback relative to the chosen answer
+		 * Get the feedback relative to the chosen answer.
 		 * 
-		 * @return string | boolean
+		 * @return string
 		 */
 		getFeedback: function()
 		{
-			var index = $('.' + settings.answerClassPicked).index();
+			var index = _data.elements.content.find('.' + settings.answerClassPicked).parents('li').index();
 			var elem;
 
 			if(index > -1)
 			{
-				elem = $(this.getAnswers()).find('choice')[index];
+				elem = this.getAnswers().find('choice')[index];
 
 				if(elem)
 				{
@@ -234,14 +243,14 @@
 				}
 			}
 
-			return false;
+			return '';
 		},
 
 		/**
-		 * return the index of the next question or false if there's no next question 
-		 * i.e. if this question was the last one
+		 * Get the index of the next question or false if there's no next question 
+		 * i.e. if this question was the last one.
 		 * 
-		 * @return number | boolean
+		 * @return Number | Boolean
 		 */
 		nextQuestion: function()
 		{                
@@ -257,7 +266,7 @@
 		/**
 		 * return true if is the first time the user answsers this question, false if not
 		 * 
-		 * @return boolean
+		 * @return Boolean
 		 */
 		firstAttempt: function()
 		{
@@ -265,9 +274,9 @@
 		},
 
 		/**
-		 * default check function, can be overriden by subclass
+		 * Check if the answer if correct or not
 		 * 
-		 * @return boolean
+		 * @return Boolean
 		 */
 		check: function() 
 		{
@@ -278,11 +287,16 @@
 				this.initialized = true;
 			}
 			
-			result = _data.elements.container.find('.' + settings.content + ' input[name="' + settings.inputName + '"]:checked');
+			result = _data.elements.content.find('input[name="' + settings.inputName + '"]:checked');
 			
 			return result.data('type') == 'true'; 
 		},
-
+	
+		/**
+		 * Return a Boolean meaning if the exercise if finished or not.
+		 * 
+		 * @return Boolean
+		 */
 		isFinished: function()
 		{
 			return (this.currentQuestion == this.lastQuestion);
@@ -300,32 +314,16 @@
 	{
 		Exercise.call(this, source);
 
-		this.zones = $(source).find('zone');
+		this.images = $(source).find('image');
 		
 		this.cache = null;
 	}
 
 	PicturePicking.prototype = new Exercise();
 
-	PicturePicking.prototype.getZones = function()
-	{
-		return this.zones;
-	};
-
-	PicturePicking.prototype.getZone = function(index)
-	{
-		if(!index)
-			index = this.currentQuestion;
-		else
-			index = parseInt(index);
-
-		return this.zones[index];
-	};
-
 	PicturePicking.prototype.getContent = function ()
 	{
-		var d = document;
-		var len = this.zones.length;
+		var len = this.images.length;
 		var img = null;
 		var container = null;
 		
@@ -336,29 +334,31 @@
 			for(var i=0; i<len; i++)
 			{
 				img = new Image();
-				img.src = settings.imagesDir + this.zones[i].getAttribute('picture');
-				img.id = this.zones[i].getAttribute('id');
-				img.alt = this.zones[i].textContent;
+				img.src = settings.imagesDir + this.images[i].getAttribute('src');
+				$(img).data('match', this.images[i].getAttribute('id'));
+				img.alt = this.images[i].textContent;
 				img.className = settings.answerClass;
-				//img.setAttribute('title', zones[i].textContent);
+				//img.setAttribute('title', images[i].textContent);
 
 				container.appendChild(img);
 			}
 		}
 
-		console.log(_data.elements.container.find('.' + settings.exercise + ' img.' + settings.answerClass).removeClass(settings.answerClassPicked + ' ' + settings.answerClassCorrect + ' ' + settings.answerClassWrong));
+		_data.elements.content.find('img.' + settings.answerClass)
+		.removeClass(settings.answerClassPicked + ' ' + settings.answerClassCorrect + ' ' + settings.answerClassWrong);
 		
 		return container;
 	};
 
-	PicturePicking.prototype.check = function($exercise_c)
+	PicturePicking.prototype.check = function()
 	{
 		if(!(this.initialized))
 		{
 			this.initialized = true;
 		}
 
-		return ($exercise_c.find('img.' + options.picked_class).attr('id') == ($(this.questions[this.currentQuestion]).find('choice').attr('id')))
+		return (_data.elements.content.find('img.' + settings.answerClass + '.' + settings.answerClassPicked)
+		.data('match') == this.getQuestion().find('choice').attr('id'));
 	};
 
 	
@@ -375,40 +375,42 @@
 
 	DragAndDrop.prototype = new Exercise();
 
-	DragAndDrop.prototype.display = function($container)
+	DragAndDrop.prototype.getContent = function()
 	{
+		// cache the document var
+		var d = document;
+		var container = d.createDocumentFragment();
 		// get the data of the draggable elements
 		var drags = this.getAnswers('drag').find('choice');
 		//get the data of the elements where the draggable elements will be dropped
 		var drops = this.getAnswers('drop').find('choice');
+		//create the two global containers
+		var dragContainer = d.createElement('ul');
+		var dropContainer = d.createElement('ol');
+
 		var i = 0;
 		var len = drags.length;
+		var drag = null;
+		var drop = null;
 
-		//create the two global containers
-		var drag_gc = document.createElement('ul');
-		drag_gc.id = options.drag_container;
-		var drop_gc = document.createElement('ol');
-
-		var drag;
-		var drop;
-
-		//clean the container
-		$container.html('');
+		dragContainer.className = settings.dragContainer;
+		$(dropContainer).addClass(settings.dropContainer).css({paddingTop:"15px", paddingBottom:"15px"});
 
 		// create and add every draggable elements to the drag global container
 		for(i; i<len; i++)
 		{
 			// create a draggable element from the data fetched before
-			drag = document.createElement('li');
-			drag.className = options.draggable_class;
+			drag = d.createElement('li');
+			drag.className = settings.draggableClass;
 			drag.innerHTML = drags[i].getAttribute('label');
-			drag.id = drags[i].getAttribute('id');
+			//drag.id = drags[i].getAttribute('id');
 
 			// make it draggable
-			$(drag).data('quizz_position', 0).draggable(
+			$(drag).data({id: drags[i].getAttribute('id'), quizz_position: 0}).draggable(
 			{
-				// draggable elements can't go out of the global container with id options.exercise
-				containment: $container,
+				// draggable elements can't go out of the content container
+				containment: _data.elements.content,
+				cursor: 'crosshair',
 				snap: '.ui-droppable',
 				snapMode: 'inner',
 				// revert the position if not dropped on a droppable element
@@ -418,7 +420,7 @@
 			//$(drag).draggable.helper.data('quizz_position', 'nok');
 
 			// add it to its container
-			drag_gc.appendChild(drag);
+			dragContainer.appendChild(drag);
 		}
 
 		len = drops.length;
@@ -426,67 +428,77 @@
 		for(i=0; i<len; i++)
 		{
 			// create a droppable element from the data fetched before
-			drop = document.createElement('li');
-			drop.className = options.droppable_class;
+			drop = d.createElement('li');
+			drop.className = settings.droppableClass;
 			drop.innerHTML = drops[i].getAttribute('label');
 
 			// make it droppable
 			$(drop).data('accept', drops[i].getAttribute('id')).droppable(
 			{
 				tolerance: 'touch',
-				hoverClass: options.picked_class,
+				hoverClass: settings.answerClassPicked,
 				drop: function(e, draggable)
 				{
-					(draggable.helper.attr('id') == $(this).data('accept'))
-					? draggable.helper.data('quizz_position', 1)
-					: draggable.helper.data('quizz_position', 0);
+					if(_data.elements.content.find('.' + settings.answerClassPicked).length > 1)
+					{
+						draggable.draggable("revert");
+					}
+					else
+					{
+						(draggable.helper.data('id') == $(this).data('accept'))
+						? draggable.helper.data('quizz_position', 1)
+						: draggable.helper.data('quizz_position', 0);
+						
+						//$(this).droppable("disable", true);
+					}
 				}
 			});
 
 			// add it to its container
-			drop_gc.appendChild(drop);
+			dropContainer.appendChild(drop);
 		}
 
 		// make the global container droppable
-		$(drag_gc).droppable(
+		$(dragContainer).droppable(
 		{
-			// update the data-position attribute
+			// reset the data-position when a draggable is dropped
 			drop: function(e, draggable)
 			{
 				draggable.helper.data('quizz_position', 0);
 			}
 		});
 
-		// add all the elements to the DOM
-		$container.append(drag_gc);
-		$container.append(drop_gc);
+		// add the drags' and drops' container to the container we return
+		container.appendChild(dragContainer);
+		container.appendChild(dropContainer);
+		
+		return container;
 	};
 
-	DragAndDrop.prototype.check = function($container)
+	DragAndDrop.prototype.check = function()
 	{
-		var li = $container.children('#' + options.drag_container).find('li.ui-draggable');
-		var i = 0;
-		var len = li.length;
+		var li = _data.elements.content.find('.' + settings.dragContainer + ' li.ui-draggable');
 		var correct = true;
-		var $current_li = null;
+		var $currentLi = null;
+		var len = li.length;
+		var i = 0;
 
 		if(!(this.initialized))
+		{
 			this.initialized = true;
+		}
 
 		for(i; i<len; i++)
 		{
-			$current_li = $(li[i]);
-			if($current_li.data('quizz_position') == 0)
+			$currentLi = $(li[i]);
+			if($currentLi.data('quizz_position') == 0)
 			{
 				correct = false;
-				$current_li.css({
-					left: 0, 
-					top:0
-				});
+				$currentLi.css({left: 0, top:0});
 			}
 			else
 			{
-				$current_li.addClass(options.correct_class).draggable("disable"/*{cancel: 'li'}*/);
+				$currentLi.addClass(settings.answerClassCorrect).draggable("disable"/*{cancel: 'li'}*/);
 			}
 		}
 
@@ -635,6 +647,9 @@
 								
 								_data.maxScore = _data.totalQuestions*settings.scoreIncrease + settings.initialScore;
 								
+								// set the initial score
+								publicMethods.updateScore(settings.initialScore);
+
 								_data.elements.container.find('.' + settings.loading)
 								.hide(500).end()
 								.find('.' + settings.btnGo).show(500);
@@ -697,17 +712,14 @@
 						 * Answer elements events binding
 						 */
 						
-						_data.elements.content.find(' .' + settings.answerClass)
+						_data.elements.content.find('.' + settings.answerClass)
 						.live('click.' + settings.eventNamespace, function()
 						{
-							_data.elements.container.find('.' + settings.content + ' .' + settings.answerClass)
+							_data.elements.content.find('.' + settings.answerClass)
 							.removeClass(settings.answerClassPicked);
 							
 							$(this).addClass(settings.answerClassPicked);
 						});
-						
-						// set the initial score
-						publicMethods.updateScore(settings.initialScore);
 					}
 					
 					// set the data to prevent the plugin from beeing accidently re-initialized
@@ -817,7 +829,7 @@
 			_data.elements.title.text(currentExercise.getTitle());
 			
 			// update the statement
-			_data.elements.statement.text(currentExercise.getStatement());
+			_data.elements.statement.html(currentExercise.getStatement());
 			
 			// get the new content to display
 			newContent = currentExercise.getContent();
@@ -864,10 +876,10 @@
 			// update the feedback and show it
 			_data.elements.feedback
 			.removeClass(settings.feedbackClassOk + ' ' + settings.feedbackClassWrong)
-			.addClass(feedbackClass).text(feedback).show();
+			.addClass(feedbackClass).text(feedback).hide().fadeIn();
 			
 			// show the "next button"
-			_data.elements.btnNext.show();
+			_data.elements.btnNext.fadeIn();
 			
 			return _data.elements.container;
 		},
