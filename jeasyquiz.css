@@ -10,7 +10,6 @@
     display: inline-block;
     width: 16px;
     height: 16px;
-    background-image: url("images/go.png"); 
     background-repeat: no-repeat; 
     background-position: right bottom;
 }
@@ -48,13 +47,11 @@
  * Visual feedback
  */
 .quizz_action_bar .quizz_feedback_ok {
-	background-image: url("images/check.png"); 
 	color:green;
 }
 
 
 .quizz_action_bar .quizz_feedback_wrong {
-	background-image: url("images/bad.png"); 
 	color:red;
 }
 
@@ -102,6 +99,8 @@ li.quizz_draggable {
 	display:inline-block; 
 	padding:5px; 
 }
+
 li.quizz_droppable {
+	margin: 10px;
 	padding: 10px;
 }
