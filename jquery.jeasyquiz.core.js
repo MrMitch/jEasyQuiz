@@ -91,20 +91,15 @@
 
 		this.currentQuestion = -1;
 
-		this.initialized = false;
+		this.firstAttempt = true;
 
 		this.lastQuestion = this.questions.length-1;
 
 		this.input_type = 'radio';
-
-		this.type = parseInt($source.attr('type'));
 	}
 
 	Exercise.prototype = 
 	{
-		/*
-		 * GETTERS
-		 */
 		/**
 		 * Get the title of the exercise
 		 * 
@@ -113,6 +108,45 @@
 		getTitle: function()
 		{ 
 			return this.title;
+		},
+
+		/**
+		 * return the current question (statement + answer) at the specified index
+		 * or the current question if no parameter supplied
+		 * 
+		 * @param index the index of the question that has to be returned
+		 * 
+		 * @return the question as a jQuey object
+		 */
+		getQuestion: function(index)
+		{
+			if(arguments.length == 0)
+			{
+				index = this.currentQuestion;
+			}
+			else
+			{
+				index = parseInt(index);
+			}
+
+			return $(this.questions[index]);
+		},
+
+		/**
+		 * return the answers for the current question
+		 * 
+		 * @return Array
+		 */
+		getAnswers: function(type)
+		{               
+			var selector = 'answer';
+
+			if(type && type.length > 1)
+			{
+				selector += '[type="' + type + '"]';
+			}
+
+			return this.getQuestion().find(selector);
 		},
 
 		/**
@@ -142,18 +176,16 @@
 		{
 			// cache the document var
 			var d = document;
-			// get all the possible answers
-			var answers = this.getAnswers().find('choice');
-			// create an ordered list to contain the answers
 			var answersContainer = d.createElement('ol');
-			var answer;
-			var label;
-			var input;
+			var answers = this.getAnswers().find('choice');
 			var len = answers.length;
-
+			var answer = null;
+			var input = null;
+			var label = null;
+			var i = 0;
 			// create a <li> element for each answer 
 			// and add it to the container previously created
-			for(var i = 0; i<len; i++)
+			for(i; i<len; i++)
 			{
 				input = d.createElement('input');
 				label = d.createElement('label');
@@ -168,7 +200,6 @@
 				label.appendChild(input);
 				label.appendChild(d.createTextNode(answers[i].getAttribute('label')));
 				answer.appendChild(label);
-				//answer.className = settings.answerClass;
 				answersContainer.appendChild(answer);
 			}
 						
@@ -177,50 +208,13 @@
 		},
 
 		/**
-		 * return the current question (statement + answer) at the specified index
-		 * or the current question if no parameter supplied
-		 * 
-		 * @param index the index of the question that has to be returned
-		 * 
-		 * @return the question as a jQuey object
-		 */
-		getQuestion: function(index)
-		{
-			if(arguments.length == 0)
-			{
-				index = this.currentQuestion;
-			}
-			else
-			{
-				index = parseInt(index);
-			}
-
-			return $(this.questions[index]);
-		},
-
-		/**
 		 * return an array containing all the questions of the exercise
 		 * 
 		 * @return Array
 		 */
-		getQuestions: function()
+		getTotalQuestions: function()
 		{
-			return this.questions;
-		},
-
-		/**
-		 * return the answers for the current question
-		 * 
-		 * @return Array
-		 */
-		getAnswers: function(type)
-		{               
-			var selector = 'answer';
-
-			if(type && type.length > 1)
-				selector += '[type="' + type + '"]';
-
-			return this.getQuestion().find(selector);
+			return this.questions.length;
 		},
 
 		/**
@@ -231,7 +225,7 @@
 		getFeedback: function()
 		{
 			var index = _data.elements.content.find('.' + settings.answerClassPicked).parents('li').index();
-			var elem;
+			var elem = null;
 
 			if(index > -1)
 			{
@@ -256,7 +250,7 @@
 		{                
 			if(this.currentQuestion < this.lastQuestion)
 			{
-				this.initialized = false;
+				this.firstAttempt = true;
 				return this.currentQuestion++;
 			}
 
@@ -264,13 +258,13 @@
 		},
 
 		/**
-		 * return true if is the first time the user answsers this question, false if not
+		 * return true if it's the first time the user answsers this question, false if not
 		 * 
 		 * @return Boolean
 		 */
 		firstAttempt: function()
 		{
-			return !(this.initialized);
+			return this.firstAttempt;
 		},
 
 		/**
@@ -282,9 +276,9 @@
 		{
 			var result = null;
 			
-			if(!(this.initialized))
+			if(this.firstAttempt)
 			{
-				this.initialized = true;
+				this.firstAttempt = false;
 			}
 			
 			result = _data.elements.content.find('input[name="' + settings.inputName + '"]:checked');
@@ -315,8 +309,6 @@
 		Exercise.call(this, source);
 
 		this.images = $(source).find('image');
-		
-		this.cache = null;
 	}
 
 	PicturePicking.prototype = new Exercise();
@@ -324,14 +316,15 @@
 	PicturePicking.prototype.getContent = function ()
 	{
 		var len = this.images.length;
-		var img = null;
 		var container = null;
+		var img = null;
+		var i = 0;
 		
 		if(!(this.currentQuestion))
 		{
 			container = document.createDocumentFragment();
 			
-			for(var i=0; i<len; i++)
+			for(i; i<len; i++)
 			{
 				img = new Image();
 				img.src = settings.imagesDir + this.images[i].getAttribute('src');
@@ -352,9 +345,9 @@
 
 	PicturePicking.prototype.check = function()
 	{
-		if(!(this.initialized))
+		if(this.firstAttempt)
 		{
-			this.initialized = true;
+			this.firstAttempt = false;
 		}
 
 		return (_data.elements.content.find('img.' + settings.answerClass + '.' + settings.answerClassPicked)
@@ -379,19 +372,16 @@
 	{
 		// cache the document var
 		var d = document;
-		var container = d.createDocumentFragment();
-		// get the data of the draggable elements
-		var drags = this.getAnswers('drag').find('choice');
-		//get the data of the elements where the draggable elements will be dropped
-		var drops = this.getAnswers('drop').find('choice');
-		//create the two global containers
 		var dragContainer = d.createElement('ul');
 		var dropContainer = d.createElement('ol');
+		var container = d.createDocumentFragment();
+		var drags = this.getAnswers('drag').find('choice');
+		var drops = this.getAnswers('drop').find('choice');
 
-		var i = 0;
 		var len = drags.length;
 		var drag = null;
 		var drop = null;
+		var i = 0;
 
 		dragContainer.className = settings.dragContainer;
 		$(dropContainer).addClass(settings.dropContainer).css({paddingTop:"15px", paddingBottom:"15px"});
@@ -483,9 +473,9 @@
 		var len = li.length;
 		var i = 0;
 
-		if(!(this.initialized))
+		if(this.firstAttempt)
 		{
-			this.initialized = true;
+			this.firstAttempt = false;
 		}
 
 		for(i; i<len; i++)
@@ -522,17 +512,20 @@
 
 	MultipleAnswers.prototype = new Exercise();
 
-	MultipleAnswers.prototype.check = function($container)
+	MultipleAnswers.prototype.check = function()
 	{
-		var answers = $container.find('input[type="checkbox"]');
-		var $answer = null;
+		var answers = _data.elements.content.find('label.' + settings.answerClass + ' input[type="checkbox"]');
 		var len = answers.length;
 		var check = true;
+		var $answer = null;
+		var i = 0;
+		
+		if(this.firstAttempt)
+		{
+			this.firstAttempt = false;
+		}
 
-		if(!(this.initialized))
-			this.initialized = true;
-
-		for(var i=0; i<len; i++)
+		for(i; i<len; i++)
 		{
 			$answer = $(answers[i]);
 
@@ -735,8 +728,9 @@
 		processData: function(rawExercises)
 		{
 			var len = rawExercises.length;
+			var i = 0;
 			
-			for(var i=0; i<len; i++)
+			for(i; i<len; i++)
 			{
 				//switch (rawExercises.eq(i).attr('type')) 
 				switch (rawExercises[i].getAttribute('type'))
@@ -746,7 +740,7 @@
 					case 'PicturePicking' : 
 					case 'pp' :
 						_data.exercises.push(new PicturePicking(rawExercises[i]));
-						_data.totalQuestions += _data.exercises[i].getQuestions().length;
+						_data.totalQuestions += _data.exercises[i].getTotalQuestions().length;
 						break;
 					case 2 : 
 					case '2' :
@@ -757,14 +751,14 @@
 					case 'AudioMatching' : 
 					case 'am' :
 						_data.exercises.push(new Exercise(rawExercises[i]));
-						_data.totalQuestions += _data.exercises[i].getQuestions().length;
+						_data.totalQuestions += _data.exercises[i].getTotalQuestions();
 						break;
 					case 4 : 
 					case '4' : 
 					case 'MultipleAnswers' : 
 					case 'ma' :
 						_data.exercises.push(new MultipleAnswers(rawExercises[i]));
-						_data.totalQuestions += _data.exercises[i].getQuestions().length;
+						_data.totalQuestions += _data.exercises[i].getTotalQuestions();
 						break;
 					case 5 : 
 					case '5' : 
@@ -772,7 +766,7 @@
 					case 'DragAndDrop' : 
 					case 'dnd' :
 						_data.exercises.push(new DragAndDrop(rawExercises[i]));
-						_data.totalQuestions += _data.exercises[i].getQuestions().length;
+						_data.totalQuestions += _data.exercises[i].getTotalQuestions();
 						break;
 					default:
 						break;
