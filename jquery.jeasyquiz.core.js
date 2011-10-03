@@ -357,7 +357,7 @@
 	
 	/**
 	 * DragAndDrop exercise.
-	 * The user has to drag each element of a set A in front of a set B.
+	 * The user has to reorder a set of element to match another set of elements
 	 * 
 	 * @param source The raw xml source
 	 */
