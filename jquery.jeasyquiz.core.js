@@ -8,7 +8,7 @@
  */
 
 /**
- * @TODO refactor the whole code according to rules defined in http://docs.jquery.com/Plugins/Authoring
+ * @TODO try making the drag'n'drop thing smoother with http://jqueryui.com/demos/sortable/
  * @TODO feedback par fonction
  * @TODO CSS
  */
