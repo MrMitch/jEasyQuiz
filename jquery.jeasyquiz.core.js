@@ -893,11 +893,6 @@
 			_data.elements.score.text(newScore + ' / ' + _data.maxScore);
 			
 			return _data.elements.container;
-		},
-		
-		test: function()
-		{
-			console.log(this);
 		}
 	};
 	
