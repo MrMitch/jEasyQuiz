@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>jEasyQuiz plugin demonstrations</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="stylesheet" type="text/css" href="../jeasyquiz.css" />
+		<script type="text/javascript" src="../jquery-ui/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="../jquery-ui/jquery-ui-1.8.16.sortable.min.js"></script>
+		<script type="text/javascript" src="../jquery.jeasyquiz.core.js"></script>
+	</head>
+	<body>
+		<header>
+			<nav></nav>
+		</header>
+		<div id="container">
+			<h1>Basic quiz</h1>
+
+			<div id="basic" class="quiz">
+				
+				
+				<div class="quizz_loading">
+					<p><img src="images/loader.gif" alt="Loading" /><br /></p>
+				</div>
+				
+				<div class="quizz_btn_go">
+					<button type="button">Start! <span class="go_img"></span></button>
+				</div>
+
+				<div class="quizz_action_bar">
+					<p>Score : <span class="quizz_score"></span>
+						<button type="button" class="quizz_btn_check">Check</button>
+						<button type="button" class="quizz_btn_next">Next question</button>
+						<span class="quizz_feedback"></span>
+					</p>
+				</div>
+				
+			</div>
+			<hr />
+
+			<h1>Custom quiz</h1>
+
+			<div id="custom" class="quiz">
+			</div>
+			<hr />
+
+			<h1>Advanced quiz</h1>
+
+			<div id="advanced" class="quiz"></div>
+			<hr />
+		</div>
+		<footer></footer>
+
+		<script type="text/javascript">
+		$(document).ready(function(){
+			
+			var a = $('#basic').jEasyQuiz({
+				source: 'data/basic.xml',
+				a: 876543
+			});
+			
+		});
+		</script>
+	</body>
+</html>

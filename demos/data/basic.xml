@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE quizz [
+<!ELEMENT quizz (exercise)+>
+<!ELEMENT exercise (title , images? , question+)>
+<!ELEMENT title (#PCDATA)>
+<!ELEMENT images (image)+>
+<!ELEMENT image (#PCDATA)>
+<!ELEMENT question (statement , answer+)>
+<!ELEMENT statement (#PCDATA)>
+<!ELEMENT answer (choice)+>
+<!ELEMENT choice EMPTY>
+<!ATTLIST exercise type NMTOKEN #REQUIRED>
+<!ATTLIST image id NMTOKEN #REQUIRED>
+<!ATTLIST image src CDATA #REQUIRED>
+<!ATTLIST question num NMTOKEN #REQUIRED>
+<!ATTLIST answer audio CDATA #IMPLIED>
+<!ATTLIST answer type CDATA #IMPLIED>
+<!ATTLIST choice audio CDATA #IMPLIED>
+<!ATTLIST choice id NMTOKEN #IMPLIED>
+<!ATTLIST choice match NMTOKEN #IMPLIED>
+<!ATTLIST choice type CDATA #IMPLIED>
+<!ATTLIST choice label CDATA #IMPLIED>
+<!ATTLIST choice feedback CDATA #IMPLIED>
+<!ENTITY blank "&lt;span&gt;______&lt;/span&gt;">
+]>
+<quizz>
+
+<!-- types : -->
+<!--
+    1 -> areas
+    2 -> select words
+    3 -> select phrases
+    4 -> drag & drop
+-->
+
+
+	
+	
+	<exercise type="5">
+		<title>Translation</title>
+		<question num="1">
+			<statement>Drag'n'drop each phrase in front of its translation</statement>
+			<answer type="drop">
+				<choice id="1" label="book"/>
+				<choice id="2" label="ago"/>
+				<choice id="3" label="confirm"/>
+				<choice id="4" label="wheel chair"/>
+				<choice id="5" label="acces"/>
+			</answer>
+			<answer type="drag">
+				<choice id="3" label="confirmer"/>
+				<choice id="5" label="accès"/>
+				<choice id="1" label="réserver"/>
+				<choice id="4" label="fauteuil roulant"/>
+				<choice id="2" label="il y a (dans le passé)"/>
+			</answer>
+		</question>
+	</exercise>
+<!-- missing sentence exercise => radio -->
+	<exercise type="3">
+
+		<title>Listen to the following sentences and pick up the rigth answer.</title>
+
+		<question num="1">
+			<statement>Click the play button to hear the situation</statement>
+			<answer audio="am1.mp3">
+				<choice type="true" label="It is not a problem" feedback="YAY !"/>
+				<choice type="false" label="It is not possible" feedback=""/>
+				<choice type="false" label="I’ll check" feedback=""/>
+			</answer>
+		</question>
+
+		<question num="2">
+			<statement>Click the play button to hear the situation</statement>
+			<answer audio="am2.mp3">
+				<choice type="false" label="The rooms are on the first floor" feedback=""/>
+				<choice type="true" label="It’s low season" feedback=""/>
+				<choice type="false" label="Our currency will be devalued then" feedback=""/>
+			</answer>
+		</question>
+
+		<question num="3">
+			<statement>Click the play button to hear the situation</statement>
+			<answer audio="am3.mp3">
+				<choice type="true" label="I’ll check it right now" feedback=""/>
+				<choice type="false" label="There is no access" feedback=""/>
+				<choice type="false" label="There is a partial access" feedback=""/>
+			</answer>
+		</question>
+        
+		<question num="4">
+			<statement>Click the play button to hear the situation</statement>
+			<answer audio="am4.mp3">
+				<choice type="true" label="You could try some other hotels in the area" feedback=""/>
+				<choice type="false" label="I’ll call the manager" feedback=""/>
+				<choice type="false" label="Try again next year" feedback=""/>
+			</answer>
+		</question>
+        
+		<question num="5">
+			<statement>Click the play button to hear the situation</statement>
+			<answer audio="am5.mp3">
+				<choice type="false" label="Call me after 15 minutes for information" feedback=""/>
+				<choice type="false" label="Look in the directory, please" feedback=""/>
+				<choice type="true" label="The number is 234-34-72" feedback=""/>
+			</answer>
+		</question>
+        
+	</exercise>
+
+
+
+<!-- areas picking exercise -->
+
+	<exercise type="1">
+
+		<title>Click on the picture corresponding to the situation you hear</title>
+
+		<images>
+			<image id="1" src="1.jpg">Computer</image>
+			<image id="2" src="2.jpg">Vacancies</image>
+			<image id="3" src="3.jpg">Customer's name</image>
+			<image id="4" src="4.jpg">Phone</image>
+			<image id="5" src="5.jpg">Access for wheelchairs</image>
+		</images>
+
+		<question num="1">
+			<statement>Click the play button to hear the sentence</statement>
+			<answer audio="pp3.mp3">
+				<choice match="3" type="true"/>
+			</answer>
+		</question>
+
+		<question num="2">
+			<statement>Click the play button to hear the sentence</statement>
+			<answer audio="pp2.mp3">
+				<choice match="2" type="true"/>
+			</answer>
+		</question>
+
+		<question num="3">
+			<statement>Click the play button to hear the sentence</statement>
+			<answer audio="pp4.mp3">
+				<choice match="4" type="true"/>
+			</answer>
+		</question>
+        
+		<question num="4">
+			<statement>Click the play button to hear the sentence</statement>
+			<answer audio="pp1.mp3">
+				<choice match="1" type="true"/>
+			</answer>
+		</question>
+        
+		<question num="5">
+			<statement>Click the play button to hear the sentence</statement>
+			<answer audio="pp5.mp3">
+				<choice match="5" type="true"/>
+			</answer>
+		</question>
+
+	</exercise>
+
+
+
+    <!-- missing word exercise -->
+	<exercise type="2">
+
+		<title>Complete the sentences with the correct expressions from the dialogue</title>
+
+		<question num="1">
+			<statement>It's &blank; from October 1st.</statement>
+			<answer>
+				<choice type="true" label="cheaper" feedback=""/>
+				<choice type="false" label="more expensive" feedback="That's grammaticaly correct but it's not the expression used in the video !"/>
+			</answer>
+		</question>
+        
+		<question num="2">
+			<statement>We look &blank; seeing you.</statement>
+			<answer>
+				<choice type="true" label="forward to" feedback=""/>
+				<choice type="false" label="soon to" feedback="Wrong, you didn't correctly listen to the dialogs !"/>
+			</answer>
+		</question>
+        
+		<question num="3">
+			<statement>It's &blank; for wheelchairs.</statement>
+			<answer>
+				<choice type="false" label="easy of access" feedback="Listen to the dialogs more carefuly !"/>
+				<choice type="true" label="easily accessible" feedback=""/>
+			</answer>
+		</question>
+        
+		<question num="4">
+			<statement>You could try &blank; hotels</statement>
+			<answer>
+				<choice type="true" label="some other" feedback=""/>
+				<choice type="false" label="some more" feedback="That's not wrong, but that's not said that way in the video."/>
+			</answer>
+		</question>
+        
+		<question num="5">
+			<statement>Our staff are &blank; to assist you.</statement>
+			<answer>
+				<choice type="false" label="willing" feedback="Nope, the answer is 'available'"/>
+				<choice type="true" label="available" feedback="You're a boss !"/>
+			</answer>
+		</question>
+
+	</exercise>
+
+
+</quizz>

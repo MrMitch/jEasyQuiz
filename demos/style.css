@@ -1,0 +1,26 @@
+
+
+div.quizz {
+	border: 1px solid black;
+}
+
+.quizz_btn_go .go_img 
+{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url("images/go.png"); 
+    background-repeat: no-repeat; 
+    background-position: right bottom;
+}
+
+.quizz_action_bar .quizz_feedback_ok {
+	background-image: url("images/check.png"); 
+	color:green;
+}
+
+
+.quizz_action_bar .quizz_feedback_wrong {
+	background-image: url("images/bad.png"); 
+	color:red;
+}

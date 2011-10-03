@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+targetNamespace="jEasyQuiz" 
+elementFormDefault="qualified">
+
+<!-- ATOMIC SIMPLE ELEMENTS -->
+    
+    <xs:element name="title" type="xs:string" />
+    
+    <xs:element name="statement" type="xs:string" />
+
+<!-- COMPLEX TYPES -->
+
+    <!-- choice_type -->
+    <xs:complexType name="choice_type">
+        <xs:attribute name="id" type="xs:string" />
+        <xs:attribute name="type" type="xs:boolean" use="required" />
+        <xs:attribute name="label" type="xs:string" />
+    </xs:complexType>
+
+    <!-- answer_type -->
+    <xs:complexType name="answer_type">
+        <xs:element name="choice" type="choice_type" minOccurs="1" maxOccurs="unbounded" />
+    </xs:complexType>
+
+    <!-- zone_type -->
+    <xs:complexType name="zone_type">
+        <xs:simpleContent>
+            <!-- contains a string -->
+            <xs:extension base="xs:string">
+                <!-- and has 2 attributes -->
+                <xs:attribute name="id" type="xs:positiveInteger" use="required" />
+                <xs:attribute name="picture" type="xs:string" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- zones_type -->
+    <xs:complexType name="zones_type">
+        <xs:element name="zone" type="zone_type" minOccurs="2" maxOccurs="unbounded" />
+    </xs:complexType>
+
+    <!-- question_type -->
+    <xs:complexType name="question">
+        <xs:attribute name="num" type="xs:positiveInteger" />
+
+        <xs:element ref="statement" minOccurs="1" maxOccurs="1"/>
+        <xs:element name="answer" type="answer_type" minOccurs="1" maxOccurs="2" />
+    </xs:complexType>
+
+
+    <!-- exercise_type -->
+    <xs:complextype name="exercise_type">
+        <xs:attribute name="num" type="xs:positiveInteger" />
+
+        <xs:element ref="title_type" minOccurs="1" maxOccurs="1" />
+        <xs:element name="zones" type="zones_type" minOccurs="0" maxOccurs="1" />
+        <xs:element name="question" type="question_type" minOccurs="1" maxOccurs="unbounded" />
+    </xs:complextype>
+
+
+
+
+    <!-- quizz -->
+    <xs:element name="quizz">
+        <xs:complexType>
+            <xs:element name="exercise" type="exercise_type" minOccurs="1" maxOccurs="5" />
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
