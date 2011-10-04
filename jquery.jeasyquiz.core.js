@@ -8,7 +8,7 @@
  */
 
 /**
- * @TODO try making the drag'n'drop thing smoother with http://jqueryui.com/demos/sortable/
+ * @TODO MultipleAnswers.check() when correct and incorrect answers are checked
  * @TODO feedback par fonction
  * @TODO CSS
  */
