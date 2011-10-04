@@ -357,7 +357,7 @@
 	
 	/**
 	 * DragAndDrop exercise.
-	 * The user has to reorder a set of element to match another set of elements
+	 * The user has to reorder a set of elements to match another set of elements
 	 * 
 	 * @param source The raw xml source
 	 */
