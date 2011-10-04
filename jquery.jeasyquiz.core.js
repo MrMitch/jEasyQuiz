@@ -8,7 +8,7 @@
  */
 
 /**
- * @TODO refactor the whole code according to rules defined in http://docs.jquery.com/Plugins/Authoring
+ * @TODO try making the drag'n'drop thing smoother with http://jqueryui.com/demos/sortable/
  * @TODO feedback par fonction
  * @TODO CSS
  */
@@ -262,7 +262,7 @@
 		 * 
 		 * @return Boolean
 		 */
-		firstAttempt: function()
+		isFirstAttempt: function()
 		{
 			return this.firstAttempt;
 		},
@@ -351,19 +351,21 @@
 		}
 
 		return (_data.elements.content.find('img.' + settings.answerClass + '.' + settings.answerClassPicked)
-		.data('match') == this.getQuestion().find('choice').attr('id'));
+			.data('match') == this.getQuestion().find('choice').attr('match'));
 	};
 
 	
 	/**
 	 * DragAndDrop exercise.
-	 * The user has to drag each element of a set A in front of a set B.
+	 * The user has to reorder a set of elements to match another set of elements
 	 * 
 	 * @param source The raw xml source
 	 */
 	function DragAndDrop(source)
 	{
 		Exercise.call(this, source);
+		
+		this.rightOrder = '';
 	}
 
 	DragAndDrop.prototype = new Exercise();
@@ -372,105 +374,86 @@
 	{
 		// cache the document var
 		var d = document;
-		var dragContainer = d.createElement('ul');
+		var dragContainer = d.createElement('ol');
 		var dropContainer = d.createElement('ol');
 		var container = d.createDocumentFragment();
 		var drags = this.getAnswers('drag').find('choice');
 		var drops = this.getAnswers('drop').find('choice');
 
 		var len = drags.length;
+		var width = _data.elements.content.width()/2 - 11
 		var drag = null;
 		var drop = null;
 		var i = 0;
 
-		dragContainer.className = settings.dragContainer;
-		$(dropContainer).addClass(settings.dropContainer).css({paddingTop:"15px", paddingBottom:"15px"});
-
-		// create and add every draggable elements to the drag global container
-		for(i; i<len; i++)
-		{
-			// create a draggable element from the data fetched before
-			drag = d.createElement('li');
-			drag.className = settings.draggableClass;
-			drag.innerHTML = drags[i].getAttribute('label');
-			//drag.id = drags[i].getAttribute('id');
-
-			// make it draggable
-			$(drag).data({id: drags[i].getAttribute('id'), quizz_position: 0}).draggable(
-			{
-				// draggable elements can't go out of the content container
-				containment: _data.elements.content,
-				cursor: 'crosshair',
-				snap: '.ui-droppable',
-				snapMode: 'inner',
-				// revert the position if not dropped on a droppable element
-				revert: 'invalid'
-			});
-
-			//$(drag).draggable.helper.data('quizz_position', 'nok');
-
-			// add it to its container
-			dragContainer.appendChild(drag);
-		}
-
-		len = drops.length;
-		// create and add every elements where the draggables can be dropped (= droppable)
-		for(i=0; i<len; i++)
-		{
-			// create a droppable element from the data fetched before
-			drop = d.createElement('li');
-			drop.className = settings.droppableClass;
-			drop.innerHTML = drops[i].getAttribute('label');
-
-			// make it droppable
-			$(drop).data('accept', drops[i].getAttribute('id')).droppable(
-			{
-				tolerance: 'touch',
-				hoverClass: settings.answerClassPicked,
-				drop: function(e, draggable)
-				{
-					if(_data.elements.content.find('.' + settings.answerClassPicked).length > 1)
-					{
-						draggable.draggable("revert");
-					}
-					else
-					{
-						(draggable.helper.data('id') == $(this).data('accept'))
-						? draggable.helper.data('quizz_position', 1)
-						: draggable.helper.data('quizz_position', 0);
-						
-						//$(this).droppable("disable", true);
-					}
-				}
-			});
-
-			// add it to its container
-			dropContainer.appendChild(drop);
-		}
-
-		// make the global container droppable
-		$(dragContainer).droppable(
-		{
-			// reset the data-position when a draggable is dropped
-			drop: function(e, draggable)
-			{
-				draggable.helper.data('quizz_position', 0);
-			}
+		dragContainer = $(dragContainer).addClass(settings.dragContainer)
+		.css({
+			'padding': '0 0 0 10px', 
+			'float': 'left', 
+			'width': width
+		});
+		
+		dropContainer = $(dropContainer).addClass(settings.dropContainer)
+		.css({
+			'padding': '0 0 0 10px', 
+			'float': 'left', 
+			'width': width
 		});
 
+		// create and add every elements where the draggables can be dropped (= droppable)
+		for(i; i<len; i++)
+		{
+			// create a list item 
+			drop = d.createElement('li');
+			drop = $(drop).addClass(settings.droppableClass)
+			//.data('id', drops[i].getAttribute('id'))
+			.text(drops[i].getAttribute('label'));
+				
+			// build the rightOrder attribute	
+			this.rightOrder += '' + drops[i].getAttribute('id') + '#';
+			
+			// add it to its container, with the data fetched before
+			dropContainer.append(drop);
+		}
+		
+		len = drags.length;
+		// create and add every draggable elements to the drag global container
+		for(i=0; i<len; i++)
+		{
+			// create a list item 
+			drag = d.createElement('li');
+			
+			// add it to its container, with all the data fetched before
+			dragContainer.append($(drag).addClass(settings.draggableClass)
+				.data('match', drags[i].getAttribute('match'))
+				.text(drags[i].getAttribute('label')));
+		}
+		
+		dragContainer.sortable({
+			containment: 'parent',
+			tolerance: 'pointer',
+			axis: 'y'
+			
+		}).disableSelection();
+
 		// add the drags' and drops' container to the container we return
-		container.appendChild(dragContainer);
-		container.appendChild(dropContainer);
+		container.appendChild(dropContainer[0]);
+		container.appendChild(dragContainer[0]);
+		container.appendChild($('<hr />', {'style': 'float:none;clear:both;height:0;visibility:hidden;'})[0]);
+		
+		this.rightOrder = this.rightOrder.split('#');
 		
 		return container;
 	};
 
 	DragAndDrop.prototype.check = function()
 	{
-		var li = _data.elements.content.find('.' + settings.dragContainer + ' li.ui-draggable');
+		var drags = _data.elements.content.find('.' + settings.dragContainer + ' li');
+		//var drops = _data.elements.content.find('.' + settings.dropContainer + ' li');
 		var correct = true;
-		var $currentLi = null;
-		var len = li.length;
+		var currentLi = null;
+		var len = drags.length;
+		var index = 0;
 		var i = 0;
 
 		if(this.firstAttempt)
@@ -480,15 +463,16 @@
 
 		for(i; i<len; i++)
 		{
-			$currentLi = $(li[i]);
-			if($currentLi.data('quizz_position') == 0)
+			currentLi = drags.eq(i);
+			index = currentLi.index();
+			
+			if(currentLi.data('match') != this.rightOrder[index])
 			{
 				correct = false;
-				$currentLi.css({left: 0, top:0});
 			}
 			else
 			{
-				$currentLi.addClass(settings.answerClassCorrect).draggable("disable"/*{cancel: 'li'}*/);
+				currentLi.addClass(settings.answerClassCorrect);
 			}
 		}
 
@@ -615,17 +599,23 @@
 						
 						if(_data.elements.container.find('.' + settings.title).length == 0)
 						{
-							_data.elements.actionBar.before($('<h2 />', {"class": settings.title}));
+							_data.elements.actionBar.before($('<h2 />', {
+								"class": settings.title
+							}));
 						}
 						
 						if(_data.elements.container.find('.' + settings.statement).length == 0)
 						{
-							_data.elements.actionBar.before($('<h3 />', {"class": settings.statement}));
+							_data.elements.actionBar.before($('<h3 />', {
+								"class": settings.statement
+							}));
 						}
 						
 						if(_data.elements.container.find('.' + settings.content).length == 0)
 						{
-							_data.elements.actionBar.before($('<div />', {"class": settings.content}));
+							_data.elements.actionBar.before($('<div />', {
+								"class": settings.content
+							}));
 						}
 						
 						$.ajax({
@@ -740,7 +730,7 @@
 					case 'PicturePicking' : 
 					case 'pp' :
 						_data.exercises.push(new PicturePicking(rawExercises[i]));
-						_data.totalQuestions += _data.exercises[i].getTotalQuestions().length;
+						_data.totalQuestions += _data.exercises[i].getTotalQuestions();
 						break;
 					case 2 : 
 					case '2' :
@@ -847,7 +837,7 @@
 			var currentExercise = privateMethods.getCurrentExercise();
 			var feedback = '';
 			var feedbackClass = '';
-			var firstAttempt = currentExercise.firstAttempt();
+			var firstAttempt = currentExercise.isFirstAttempt();
 			
 			if(currentExercise.check() === true)
 			{

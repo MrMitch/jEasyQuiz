@@ -5,6 +5,10 @@
     Description:
 */
 
+div.quiz {
+	width: 700px;
+}
+
 .quizz_btn_go .go_img 
 {
     display: inline-block;
@@ -94,6 +98,7 @@
 .quizz_container ol li {
 	margin:10px;
 }
+/*
 li.quizz_draggable {
 	border: 1px solid black; 
 	display:inline-block; 
@@ -104,3 +109,4 @@ li.quizz_droppable {
 	margin: 10px;
 	padding: 10px;
 }
+*/

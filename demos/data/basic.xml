@@ -34,6 +34,28 @@
 -->
 
 
+	<exercise type="4">
+		<title>Check the correct answers</title>
+		<question>
+			<statement>Which of these are OO languages ?</statement>
+			<answer>
+				<choice type="true" label="C++" />
+				<choice label="C" />
+				<choice type="true" label="JAVA" />
+				<choice label="Pascal" />
+			</answer>
+		</question>
+		<question>
+			<statement>Blablabla</statement>
+			<answer>
+				<choice type="true" label="true" />
+				<choice label="false" />
+				<choice label="false" />
+				<choice type="true" label="true" />
+			</answer>
+		</question>
+	</exercise>
+
 	
 	
 	<exercise type="5">
@@ -48,11 +70,11 @@
 				<choice id="5" label="acces"/>
 			</answer>
 			<answer type="drag">
-				<choice id="3" label="confirmer"/>
-				<choice id="5" label="accès"/>
-				<choice id="1" label="réserver"/>
-				<choice id="4" label="fauteuil roulant"/>
-				<choice id="2" label="il y a (dans le passé)"/>
+				<choice match="3" label="confirmer"/>
+				<choice match="5" label="accès"/>
+				<choice match="1" label="réserver"/>
+				<choice match="4" label="fauteuil roulant"/>
+				<choice match="2" label="il y a (dans le passé)"/>
 			</answer>
 		</question>
 	</exercise>
@@ -160,7 +182,7 @@
 		</question>
 
 	</exercise>
-
+	
 
 
     <!-- missing word exercise -->
